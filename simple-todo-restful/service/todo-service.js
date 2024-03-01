@@ -1,10 +1,11 @@
 export {TodoService}
 
+import { todoList } from "simple-todo-restful/data/todoModel"
+
 class TodoService{
-  todoList = ["Dummy 1", "Dummy 2", "Dummy 3"];
 
   getResponseJson(){
-    let todoListResponseObject = this.todoList.map((item,idx) =>
+    let todoListResponseObject = todoList.map((item,idx) =>
       ({
         id: idx,
         todo: item
@@ -27,7 +28,7 @@ class TodoService{
   postTodo(req, resp){
     req.addListener("data", (data)=>{
       const body = JSON.parse(data.toString());
-      this.todoList.push(body.todo)
+      todoList.push(body.todo)
       resp.write(`Success post a todo: ${body.todo}`)
       resp.end()
     })
@@ -36,8 +37,8 @@ class TodoService{
   updateTodo(req, resp){
     req.addListener("data", (data)=>{
       const body = JSON.parse(data.toString())
-      if (parseInt(body.todoId) <= this.todoList.length-1){
-        this.todoList[body.todoId] = body.todo
+      if (parseInt(body.todoId) <= todoList.length-1){
+        todoList[body.todoId] = body.todo
         resp.write(`Success updating a todo with id ${body.todoId}: ${body.todo}`)
       } else {
         resp.write(`Failed updating todo: todo with id ${body.todoId} not found!`)
@@ -49,8 +50,8 @@ class TodoService{
   deleteTodo(req, resp){
     req.addListener("data", (data)=>{
       const body = JSON.parse(data.toString())
-      if (parseInt(body.todoId) <= this.todoList.length-1){
-        this.todoList.splice(parseInt(body.todoId),1)
+      if (parseInt(body.todoId) <= todoList.length-1){
+        todoList.splice(parseInt(body.todoId),1)
         resp.write(`Success deleting a todo with id ${body.todoId}`)
       } else {
         resp.write(`Failed deleting todo: todo with id ${body.todoId} not found!`)

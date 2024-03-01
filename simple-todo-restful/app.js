@@ -1,5 +1,5 @@
 import http from "http";
-import { TodoService } from "./service/todo-service.mjs";
+import { TodoService } from "simple-todo-restful/service/todoService";
 
 const todoService = new TodoService();
 const server = http.createServer((req, resp)=>{

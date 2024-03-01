@@ -1,0 +1,30 @@
+{
+  "name": "simple-todo-restful",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "NodeJs Learning",
+  "exports": {
+    ".": "./app.js",
+    "./data/todoModel": "./data/todoModel.js",
+    "./service/todoService": "./service/todo-service.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fortissible/nodejs-learn.git#master"
+  },
+  "keywords": [
+    "NodeJs",
+    "NPM",
+    "JS"
+  ],
+  "author": "Fortissible",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fortissible/nodejs-learn/issues"
+  },
+  "homepage": "https://github.com/Fortissible/nodejs-learn/tree/master#readme"
+}
