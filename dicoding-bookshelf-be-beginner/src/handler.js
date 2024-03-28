@@ -1,11 +1,13 @@
 
 let {Book, bookList} = require("./books");
+const {filterByName, filterByRead, filterByFinished} = require("./utils");
 
 const addBookHandler = (request, h) => {
   const {
     name, year, author, summary, publisher,
     pageCount, readPage, reading,
   } = request.payload;
+
   let newBook = new Book(
     name,
     year,
@@ -16,13 +18,14 @@ const addBookHandler = (request, h) => {
     readPage,
     reading
   );
-  const newBookId = newBook.id;
-  bookList.push(newBook);
-  
-  const isBookNameValid = name ? true : false; 
+
+  const isBookNameValid = name != undefined ? true : false; 
   const isPageValid = readPage > pageCount ? false : true; 
 
   if (isBookNameValid && isPageValid){
+
+    const newBookId = newBook.id;
+    bookList.push(newBook);
     const resp = h.response({
       status: 'success',
       message: 'Buku berhasil ditambahkan',
@@ -33,7 +36,9 @@ const addBookHandler = (request, h) => {
 
     resp.code(201);
     return resp;
+
   } else {
+
     const resp = h.response({
       status: 'fail',
       message: !isPageValid 
@@ -43,14 +48,41 @@ const addBookHandler = (request, h) => {
 
     resp.code(400);
     return resp;
+    
   }
 }
 
 const getAllBooks = (request, h) => {
+  
+  let bookResult = bookList;
+  let queries= request.query;
+
+  if (queries.name){
+    bookResult = filterByName(queries.name, bookResult);
+  }
+
+  if (queries.reading != undefined){
+    bookResult = filterByRead(queries.reading, bookResult);
+  }
+
+  if (queries.finished != undefined){
+    bookResult = filterByFinished(queries.finished, bookResult);
+  }
+
+  let responseResult = bookResult.map((book)=>{
+    return {
+      id: book.id,
+      name: book.name,
+      publisher: book.publisher
+    }
+  });
+
+  console.log(responseResult);
+
   const response = h.response({
     status : 'success',
     data : {
-      books: bookList
+      books: responseResult
     }
   })
   response.code(200);
