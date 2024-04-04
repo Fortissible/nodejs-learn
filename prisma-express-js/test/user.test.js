@@ -1,7 +1,8 @@
 import { logger } from "../src/application/logging.js";
 import { web } from "../src/application/web.js";
 import supertest from "supertest";
-import { createTestUser, removeTestUser } from "./test-util.js";
+import { createTestUser, getTestUser, removeTestUser } from "./test-util.js";
+import bcrypt from "bcrypt";
 
 describe("POST /api/users", () => {
 
@@ -152,4 +153,103 @@ describe("GET /api/users/current", ()=>{
     expect(result.status).toBe(401);
     expect(result.body.errors).toBe("Unauthorized");
   })
-})
+});
+
+describe("PATCH /api/users/current", ()=>{
+  beforeEach(async ()=>{
+    await createTestUser();
+  });
+
+  afterEach(async ()=>{
+    await removeTestUser();
+  });
+
+  it("should can update user name and password", async ()=>{
+    const result = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "test")
+      .send({
+        name: "UpdatedFortissible",
+        password: "UpdatedPassword"
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("fortissible");
+    expect(result.body.data.name).toBe("UpdatedFortissible");
+
+    const user = await getTestUser();
+    expect(await bcrypt.compare("UpdatedPassword", user.password)).toBe(true);
+  });
+
+  it("should can update user name only", async ()=>{
+    const result = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "test")
+      .send({
+        name: "UpdatedFortissible",
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("fortissible");
+    expect(result.body.data.name).toBe("UpdatedFortissible");
+  });
+
+  it("should can update user password only", async ()=>{
+    const result = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "test")
+      .send({
+        password: "UpdatedPassword",
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("fortissible");
+    expect(result.body.data.name).toBe("fortissible");
+
+    const user = await getTestUser();
+
+    expect(await bcrypt.compare("UpdatedPassword", user.password)).toBe(true);
+  });
+
+  it("should reject if request is not valid", async ()=>{
+    const result = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "token_salah")
+      .send({
+        password: "UpdatedPassword",
+      });
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe("DELETE /api/users/logout", ()=>{
+  beforeEach(async ()=>{
+    await createTestUser();
+  });
+
+  afterEach(async ()=>{
+    await removeTestUser();
+  });
+
+  it("should can logout", async ()=>{
+    const result = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "test")
+    
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBe("OK");
+
+    const user = await getTestUser();
+    expect(user.token).toBe(null);
+  });
+
+  it("should reject logout if request invalid", async ()=>{
+    const result = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "token_salah")
+    
+    expect(result.status).toBe(401);
+  });
+});
