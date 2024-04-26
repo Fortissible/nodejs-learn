@@ -1,6 +1,8 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
+// mengimpor dotenv dan menjalankan konfigurasinya
+require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const NotesValidator = require('./validator/notes');
@@ -9,15 +11,20 @@ const NotesValidator = require('./validator/notes');
 
 // PLUGIN STYLE
 const notes = require('./api/notes');
-const NotesService = require('./services/inMemory/NotesService');
 const ClientError = require('./exceptions/ClientError');
+
+// IN MEMORY DATA
+// const NotesService = require('./services/inMemory/NotesService');
+
+// DB DATA
+const NotesService = require('./services/postgres/NotesService');
 
 const init = async () => {
   const notesService = new NotesService();
 
   const server = Hapi.server({
-    port: 5000,
-    host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
+    port: process.env.PORT,
+    host: process.env.HOST,
     routes: { // CORS pada semua routes
       cors: {
         origin: ['*'],
