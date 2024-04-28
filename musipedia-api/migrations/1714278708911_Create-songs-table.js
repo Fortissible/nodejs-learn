@@ -26,7 +26,7 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       notNull: true,
     },
-    genre: {
+    performer: {
       type: 'VARCHAR(100)',
       notNull: true,
     },
