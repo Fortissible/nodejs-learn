@@ -1,5 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable no-underscore-dangle */
 const NotesHandler = require('./handler');
 const routes = require('./routes');
 

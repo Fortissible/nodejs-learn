@@ -1,5 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable no-underscore-dangle */
 const InvariantError = require('../../exceptions/InvariantError');
 const { NotePayloadSchema } = require('./schema');
 

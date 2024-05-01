@@ -1,14 +1,8 @@
-/* eslint-disable linebreak-style */
 const routes = (handler) => [
   {
     method: 'POST',
     path: '/notes',
     handler: handler.postNoteHandler,
-    // options: { // CORS dengan HAPI spesifik pada suatu routes
-    //   cors: {
-    //     origin: ['*'],
-    //   },
-    // },
     options: {
       auth: 'notesapp_jwt',
     },

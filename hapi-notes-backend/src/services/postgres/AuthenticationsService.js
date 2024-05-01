@@ -1,9 +1,8 @@
-/* eslint-disable linebreak-style */
 /* eslint-disable no-underscore-dangle */
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 
-class AuthService {
+class AuthenticationsService {
   constructor() {
     this._pool = new Pool();
   }
@@ -23,20 +22,23 @@ class AuthService {
       values: [token],
     };
 
-    const { rowCount } = await this._pool.query(query);
+    const result = await this._pool.query(query);
 
-    if (!rowCount) {
+    if (!result.rows.length) {
       throw new InvariantError('Refresh token tidak valid');
     }
   }
 
   async deleteRefreshToken(token) {
+    await this.verifyRefreshToken(token);
+
     const query = {
       text: 'DELETE FROM authentications WHERE token = $1',
       values: [token],
     };
+
     await this._pool.query(query);
   }
 }
 
-module.exports = AuthService;
+module.exports = AuthenticationsService;

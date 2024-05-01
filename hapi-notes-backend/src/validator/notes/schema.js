@@ -1,6 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-underscore-dangle */
 const Joi = require('joi');
 
 const NotePayloadSchema = Joi.object({
@@ -9,6 +6,4 @@ const NotePayloadSchema = Joi.object({
   tags: Joi.array().items(Joi.string()).required(),
 });
 
-module.exports = {
-  NotePayloadSchema,
-};
+module.exports = { NotePayloadSchema };
