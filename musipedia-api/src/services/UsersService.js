@@ -21,13 +21,15 @@ class UsersService {
       throw new AuthenticationError("Kredensial salah!");
     }
     
-    const passwordMatch = await bcrypt.compare(password, result.rows[0].password);
+    const { id, password: hashedPassword } = result.rows[0];
 
-    if (!passwordMatch) {
+    const match = await bcrypt.compare(password, hashedPassword);
+
+    if (!match) {
       throw new AuthenticationError("Kredensial salah!");
     }
 
-    return result.rows[0].id;
+    return id;
   }
 
   async verifyUsername(username){
@@ -44,23 +46,18 @@ class UsersService {
   }
 
   async addUser({username, password, fullname}) {
-    await this.verifyUsername(username);
-
     const id = `users-${nanoid(16)}`;
-
     const hashPassword = await bcrypt.hash(password,10);
 
     const query = {
-      text: 'INSERT INTO users VALUES($1, $2, $3, $3) RETURNING id',
+      text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id',
       values: [id, username, hashPassword, fullname],
     };
-
     const result = await this._pool.query(query);
 
     if (!result.rows.length){
       throw new InvariantError("Gagal mendaftarkan akun");
     }
-
     return result.rows[0].id;
   }
 }

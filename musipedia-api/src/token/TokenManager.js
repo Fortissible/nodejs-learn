@@ -8,7 +8,7 @@ const TokenManager = {
     try {
       const artf = Jwt.token.decode(refreshToken);
       Jwt.token.verifySignature(artf, process.env.REFRESH_TOKEN_KEY);
-      const {payload} = artf.decoded.payload;
+      const {payload} = artf.decoded;
       return payload;
     } catch (e) {
       throw new InvariantError('Refresh token invalid');
