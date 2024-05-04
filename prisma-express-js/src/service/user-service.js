@@ -50,7 +50,9 @@ const login = async (request) => {
     throw new ResponseError(401, "Username or password incorrect");
   }
 
+  // GENERATE TOKEN
   const token = uuid().toString();
+
   return prismaClient.user.update({
     data: {
       token: token,
