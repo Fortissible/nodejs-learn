@@ -29,8 +29,8 @@ class AlbumService {
   }
 
   async getAlbums() {
-    const result = await this._pool.query('SELECT * FROM albums');
-    return result.rows.map(albumDbToModel);
+    const result = await this._pool.query('SELECT id, name, year FROM albums');
+    return result.rows;
   }
 
   async getAlbumById(id) {
@@ -87,6 +87,19 @@ class AlbumService {
 
     if (!result.rows.length){
       throw new NotFoundError("Delete gagal, id album tidak ditemukan.");
+    }
+  }
+
+  async updateAlbumCover(id, coverUrl) {
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+      values: [coverUrl, id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Album cover update failed!');
     }
   }
 }

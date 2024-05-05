@@ -3,12 +3,14 @@ const albumDbToModel = ({
   name, 
   year,
   _,
-  __
+  __,
+  cover,
 }) => (
   {
     id,
     name,
-    year
+    year,
+    cover
   }
 );
 
@@ -18,13 +20,15 @@ const albumDbToModelDetail = ({
   year,
   _,
   __,
-  songs
+  songs,
+  cover
 }) => (
   {
     id,
     name,
     year,
-    songs
+    songs,
+    coverUrl: cover
   }
 );
 

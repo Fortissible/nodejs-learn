@@ -1,13 +1,15 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
-
+const Inert = require('@hapi/inert');
+const path = require('path');
 const ClientError = require('./exceptions/ClientError');
 
 // Albums
 const albums = require('./api/albums');
 const AlbumService = require('./services/AlbumService');
 const AlbumsValidator = require('./validator/albums');
+const StorageService = require('./services/storage/StorageService');
 
 // Songs
 const songs = require('./api/songs');
@@ -30,6 +32,16 @@ const playlist = require('./api/playlist');
 const PlaylistService = require('./services/PlaylistService');
 const playlistValidator = require('./validator/playlist');
 
+// Exports
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
+// Album Likes
+const albumLikes = require('./api/albumLikes');
+const AlbumLikesServices = require('./services/AlbumLikesService');
+const CacheService = require('./services/redis_cache/CacheService');
+
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT,
@@ -45,6 +57,9 @@ const init = async () => {
     {
       plugin: Jwt,
     },
+    {
+      plugin: Inert,
+    }
   ]);
 
   server.auth.strategy('musipedia_jwt', 'jwt', {
@@ -84,11 +99,18 @@ const init = async () => {
   const authService = new AuthenticationsService();
   const userService = new UsersService();
   const playlistService = new PlaylistService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/albums/file/cover'));
+  const cacheService = new CacheService();
+  const albumLikesService = new AlbumLikesServices(
+    cacheService
+  );
+
   await server.register([
     {
       plugin: albums,
       options: {
         service: albumService,
+        storageService: storageService,
         validator: AlbumsValidator
       }
     },
@@ -123,6 +145,21 @@ const init = async () => {
         validator: userValidator
       },
     },
+    {
+      plugin: _exports,
+      options: {
+        service: ProducerService,
+        playlistService: playlistService,
+        validator: ExportsValidator,
+      },
+    },
+    {
+      plugin: albumLikes,
+      options: {
+        albumLikesService,
+        albumService
+      }
+    }
   ]);
 
   await server.start();
